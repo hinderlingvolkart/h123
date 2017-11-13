@@ -1,0 +1,134 @@
+body {
+  background: rgba(255,255,255,0.95);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+body {
+  padding: 0;
+  margin: 0;
+  font: 14px/1.6 "Helvetica Neue", Helvetica, Arial, sans;
+  font: caption;
+  line-height: 1.6;
+  color: #284900;
+}
+body {
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  padding: 15px;
+}
+
+ul {
+    margin: 0 0 0 -10px;
+    padding: 0;
+}
+li {
+  list-style: none;
+  margin-left: 20px;
+  margin-bottom: 4px;
+}
+
+
+a {
+  color: #284900;
+  text-decoration: none;
+  display: block;
+  max-width: 30em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 23px;
+  position: relative;
+  line-height: 1.3;
+}
+a > .level {
+  display: inline-block;
+  background-color: #284900;
+  color: white;
+  font-size: 85%;
+  font-weight: bold;
+  width: 2.7ex;
+  height: 2.7ex;
+  text-align: center;
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0px;
+  padding-top: 1px;
+}
+.wrong-level .level {
+  background-color: #AF3A37;
+}
+
+a:hover {
+    background-color: #284900;
+    color: white;
+}
+a:hover > .level {
+  background-color: transparent;
+}
+
+
+header {
+  padding-top: 5px;
+  padding-bottom: 15px;
+  padding-right: 5em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid #eee;
+}
+legend {
+  float: left;
+  margin-right: 1em;
+  font-weight: bold;
+}
+.options {
+  display: flex;
+  flex-wrap: wrap;
+}
+.options .input {
+  margin-right: 2em;
+}
+.tooltip {
+  position: relative;
+}
+.tooltip:before {
+  content: 'ℹ️';
+}
+.tooltip:focus:after,
+.tooltip:hover:after {
+  content: attr(title);
+  position: absolute;
+  background: white;
+  padding: 4px 10px;
+  top: 70%;
+  left: 70%;
+  width: 10em;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  white-space: normal;
+  border-radius: 8px;
+  border-top-left-radius: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.button-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 0;
+  font-size: inherit;
+  color: white;
+  background-color: #284900;
+  cursor: pointer;
+}
+.button-close:hover {
+  color: white;
+  background-color: #284900;
+}
+
+

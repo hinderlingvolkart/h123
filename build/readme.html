@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Bookmarklet {{version}}</title>
+	<style>
+		body {
+			font:  bold 4vw/1.4 "Helvetica Neue", Helvetica, Arial;
+			padding:  40px;
+			padding:  20vmin;
+			text-align: center;
+		}
+		.emoticon {
+			font: caption;
+			font-size:  4vw;
+		}
+		a {
+			text-decoration: none;
+			border:  1px solid;
+			padding: 5px 8px;
+			border-radius: .2ex;
+		}
+	</style>
+</head>
+<body>
+	<p>
+		Drag this to your bookmarks:
+		<br><br>
+		<a href="javascript:(function(){var%20containerId%3D%22a11y-bookmarklet%22%2CcontainerStyle%3D%22position%3A%20fixed%3B%20top%3A%200%3B%20right%3A%200%3B%20bottom%3A%200%22%2Ccontainer%3Ddocument.getElementById(containerId)%3Bcontainer%26%26document.body.removeChild(container)%2C(container%3Ddocument.createElement(%22DIV%22)).id%3DcontainerId%2Ccontainer.style.cssText%3DcontainerStyle%2Ciframe%3Ddocument.createElement(%22IFRAME%22)%2Ciframe.style.width%3D%22320px%22%2Ciframe.style.height%3D%22100%25%22%2Ciframe.style.borderWidth%3D%220%22%2Ccontainer.appendChild(iframe)%2Ciframe.onload%3Dfunction()%7Biframe.onload%3Dfunction()%7B%7D%3Bvar%20e%3Diframe.contentWindow.document%3Be.open()%2Ce.write('%3Chtml%3E%20%3Chead%3E%20%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2Cminimum-scale%3D1.0%2Cinitial-scale%3D1%2Cuser-scalable%3Dyes%22%3E%20%3Cstyle%3Eh1%20%7B%20color%3A%20red%3B%20-webkit-transform%3A%20scale(2)%3B%20transform%3A%20scale(2)%3B%20%7D%20%3C%2Fstyle%3E%20%3C%2Fhead%3E%20%3Cbody%3E%20%3Ch1%3EWow%3C%2Fh1%3E%20%3Cp%3EThis%20is%20fantastic!!%3C%2Fp%3E%20%3C%2Fbody%3E%20%3C%2Fhtml%3E%20')%2Ce.close()%3Bvar%20t%3Diframe.contentWindow.document.getElementById(%22quit-button%22)%3Bt%26%26t.addEventListener(%22click%22%2Cfunction(e)%7Bdocument.body.removeChild(container)%7D)%7D%2Cdocument.body.appendChild(container)%3B}())">Show Headings</a>
+		<br><br>
+		<a class="emoticon" href="javascript:(function(){var%20containerId%3D%22a11y-bookmarklet%22%2CcontainerStyle%3D%22position%3A%20fixed%3B%20top%3A%200%3B%20right%3A%200%3B%20bottom%3A%200%22%2Ccontainer%3Ddocument.getElementById(containerId)%3Bcontainer%26%26document.body.removeChild(container)%2C(container%3Ddocument.createElement(%22DIV%22)).id%3DcontainerId%2Ccontainer.style.cssText%3DcontainerStyle%2Ciframe%3Ddocument.createElement(%22IFRAME%22)%2Ciframe.style.width%3D%22320px%22%2Ciframe.style.height%3D%22100%25%22%2Ciframe.style.borderWidth%3D%220%22%2Ccontainer.appendChild(iframe)%2Ciframe.onload%3Dfunction()%7Biframe.onload%3Dfunction()%7B%7D%3Bvar%20e%3Diframe.contentWindow.document%3Be.open()%2Ce.write('%3Chtml%3E%20%3Chead%3E%20%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2Cminimum-scale%3D1.0%2Cinitial-scale%3D1%2Cuser-scalable%3Dyes%22%3E%20%3Cstyle%3Eh1%20%7B%20color%3A%20red%3B%20-webkit-transform%3A%20scale(2)%3B%20transform%3A%20scale(2)%3B%20%7D%20%3C%2Fstyle%3E%20%3C%2Fhead%3E%20%3Cbody%3E%20%3Ch1%3EWow%3C%2Fh1%3E%20%3Cp%3EThis%20is%20fantastic!!%3C%2Fp%3E%20%3C%2Fbody%3E%20%3C%2Fhtml%3E%20')%2Ce.close()%3Bvar%20t%3Diframe.contentWindow.document.getElementById(%22quit-button%22)%3Bt%26%26t.addEventListener(%22click%22%2Cfunction(e)%7Bdocument.body.removeChild(container)%7D)%7D%2Cdocument.body.appendChild(container)%3B}())">H1️⃣2️⃣3️⃣</a>
+</body>
+</html>

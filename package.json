@@ -1,0 +1,28 @@
+{
+  "name": "h123",
+  "version": "0.0.1",
+  "description": "A bookmarklet to see accessible headings like a screenreader",
+  "scripts": {
+    "start": "gulp work"
+  },
+  "main": "src/index.js",
+  "dependencies": {
+    "autoprefixer": "^7.1.6",
+    "gulp": "^3.9.1",
+    "gulp-concat": "~2.3.4",
+    "gulp-filter": "^5.0.1",
+    "gulp-postcss": "^7.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
+    "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^3.0.0",
+    "postcss-js": "^1.0.1"
+  },
+  "browserslist": [
+    "defaults",
+    "> 1%",
+    "iOS >= 8.4"
+  ],
+  "author": "Hinderling Volkart AG",
+  "license": "UNLICENSED"
+}
