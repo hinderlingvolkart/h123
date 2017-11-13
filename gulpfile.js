@@ -31,7 +31,9 @@ function prepareJSVariable(str) {
 gulp.task('readme', ['compile'], function() {
   return gulp.src('src/readme.html')
     .pipe(replace('{{bookmarklet}}', getBookmarklet()))
-    .pipe(gulp.dest('build'));
+    .pipe(gulp.dest('build'))
+    .pipe(rename('readme.md'))
+    .pipe(gulp.dest('./'))
 });
 
 
