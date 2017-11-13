@@ -18,7 +18,7 @@ var files = [
 
 
 function getBookmarklet() {
-  var script = fs.readFileSync('build/bookmarklet.js', 'utf8');
+  var script = fs.readFileSync('docs/bookmarklet.js', 'utf8');
   return 'javascript:(function(){' + encodeURIComponent(script) + '}())';
 }
 
@@ -31,9 +31,8 @@ function prepareJSVariable(str) {
 gulp.task('readme', ['compile'], function() {
   return gulp.src('src/readme.html')
     .pipe(replace('{{bookmarklet}}', getBookmarklet()))
-    .pipe(gulp.dest('build'))
-    .pipe(rename('readme.md'))
-    .pipe(gulp.dest('./'))
+    .pipe(rename('index.html'))
+    .pipe(gulp.dest('docs'))
 });
 
 
@@ -53,9 +52,9 @@ gulp.task('compile', function(cb) {
       html = html.replace('{{css}}', cssResult.css);
       var stream = gulp.src('src/*.js')
         .pipe(replace('{{ui}}', prepareJSVariable(html)))
-        .pipe(gulp.dest('./build'))
+        .pipe(gulp.dest('./docs'))
         .pipe(uglify())
-        .pipe(gulp.dest('./build'))
+        .pipe(gulp.dest('./docs'))
         .on('end', cb);
     });
 });
