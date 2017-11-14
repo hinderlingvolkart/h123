@@ -35,7 +35,7 @@ iframe.onload = function () {
   var quitButton = doc.querySelector('[data-action="close"]');
   if (quitButton) {
     quitButton.addEventListener('click', function (e) {
-      iframe.contentWindow.removeEventListener('resize', updateHeight);
+      window.removeEventListener('resize', updateHeight);
       document.body.removeChild(container);
       if (document.getElementById(highlighterEl.id)) {
         document.body.removeChild(highlighterEl);
@@ -76,7 +76,7 @@ iframe.onload = function () {
     highlightElement(target);
   }, false);
 
-  iframe.contentWindow.addEventListener('resize', updateHeight);
+  window.addEventListener('resize', updateHeight);
 
   function switcher(id, className) {
     var checkbox = doc.getElementById(id);
