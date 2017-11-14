@@ -1,6 +1,6 @@
 
 var containerId = 'a11y-bookmarklet';
-var containerStyle = 'position: fixed; top: 0; right: 0; bottom: 0; box-shadow: 0 0 80px rgba(0,0,0,0.3); width: 20%; min-width: 320px; max-width: 450px; z-index: 1000001;';
+var containerStyle = 'position: fixed; top: 0; right: 0; max-height: 100%; box-shadow: 0 0 80px rgba(0,0,0,0.3); width: 20%; min-width: 320px; max-width: 450px; z-index: 1000001;';
 
 var highlighterEl = document.createElement('DIV');
 highlighterEl.id = 'h1-a11y-highlighterelement';
@@ -22,11 +22,12 @@ iframe.style.height = '100%';
 iframe.style.borderWidth = '0';
 
 var outline = getOutline();
+var doc;
 
 container.appendChild(iframe);
 iframe.onload = function () {
   iframe.onload = function () {};
-  var doc = iframe.contentWindow.document;
+  doc = iframe.contentWindow.document;
   doc.open();
   doc.write('{{ui}}');
   doc.close();
@@ -34,6 +35,7 @@ iframe.onload = function () {
   var quitButton = doc.querySelector('[data-action="close"]');
   if (quitButton) {
     quitButton.addEventListener('click', function (e) {
+      iframe.contentWindow.removeEventListener('resize', updateHeight);
       document.body.removeChild(container);
       if (document.getElementById(highlighterEl.id)) {
         document.body.removeChild(highlighterEl);
@@ -48,7 +50,7 @@ iframe.onload = function () {
 
   targetEl = doc.querySelector('#o-hidden-count');
   if (targetEl) {
-    targetEl.innerText = countOutline(outline, 'hidden');
+    targetEl.innerText = outline.length - countOutline(outline, 'visible');
   }
 
   targetEl = doc.querySelector('#o-visuallyhidden-count');
@@ -58,6 +60,8 @@ iframe.onload = function () {
 
   switcher('o-hidden', 'show-hidden');
   switcher('o-visuallyhidden', 'mark-visuallyhidden');
+
+  updateHeight();
 
   doc.addEventListener('mouseover', function(event) {
     var link;
@@ -72,6 +76,8 @@ iframe.onload = function () {
     highlightElement(target);
   }, false);
 
+  iframe.contentWindow.addEventListener('resize', updateHeight);
+
   function switcher(id, className) {
     var checkbox = doc.getElementById(id);
     var target = doc.querySelector('.result');
@@ -82,6 +88,7 @@ iframe.onload = function () {
         } else {
           target.classList.remove(className);
         }
+        if (e) updateHeight();
       };
       checkbox.addEventListener('change', check, false);
       checkbox.addEventListener('click', check, false);
@@ -93,6 +100,10 @@ iframe.onload = function () {
 document.body.appendChild(container);
 
 
+function updateHeight() {
+  container.style.height = '0px';
+  container.style.height = doc.scrollingElement.scrollHeight + 'px';
+}
 function getOutline() {
   var previousLevel = 0;
   var els = document.querySelectorAll('h1,h2,h3,h4,h5,h6,h7,[role="heading"]');
