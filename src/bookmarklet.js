@@ -1,6 +1,6 @@
 
 var containerId = 'a11y-bookmarklet';
-var containerStyle = 'position: fixed; top: 0; right: 0; bottom: 0; box-shadow: 0 0 80px rgba(0,0,0,0.3); width: 20%; min-width: 280px; max-width: 450px; z-index: 1000000;';
+var containerStyle = 'position: fixed; top: 0; right: 0; bottom: 0; box-shadow: 0 0 80px rgba(0,0,0,0.3); width: 20%; min-width: 320px; max-width: 450px; z-index: 1000001;';
 
 var highlighterEl = document.createElement('DIV');
 highlighterEl.id = 'h1-a11y-highlighterelement';
@@ -20,6 +20,8 @@ var iframe = document.createElement('IFRAME');
 iframe.style.width = '100%';
 iframe.style.height = '100%';
 iframe.style.borderWidth = '0';
+
+var outline = getOutline();
 
 container.appendChild(iframe);
 iframe.onload = function () {
@@ -41,7 +43,17 @@ iframe.onload = function () {
 
   var targetEl = doc.querySelector('#result');
   if (targetEl) {
-    targetEl.innerHTML = getOutlineAsHTML();
+    targetEl.innerHTML = outlineToHTML(outline);
+  }
+
+  targetEl = doc.querySelector('#o-hidden-count');
+  if (targetEl) {
+    targetEl.innerText = countOutline(outline, 'hidden');
+  }
+
+  targetEl = doc.querySelector('#o-visuallyhidden-count');
+  if (targetEl) {
+    targetEl.innerText = countOutline(outline, 'visuallyhidden');
   }
 
   switcher('o-hidden', 'show-hidden');
@@ -55,9 +67,8 @@ iframe.onload = function () {
       link = event.target.parentElement;
     }
     if (!link) return;
-    console.log('Link', link);
-    var target = document.querySelector(link.getAttribute('href'));
-    console.log('Target', target);
+    var index = parseInt(link.getAttribute('href').substr(1), 10);
+    var target = outline[index].el;
     highlightElement(target);
   }, false);
 
@@ -82,14 +93,10 @@ iframe.onload = function () {
 document.body.appendChild(container);
 
 
-
-
-function getOutlineAsHTML() {
-  var idCounter = 0;
+function getOutline() {
   var previousLevel = 0;
-
   var els = document.querySelectorAll('h1,h2,h3,h4,h5,h6,h7,[role="heading"]');
-  var html = '';
+  var result = [];
   for (var i = 0; i < els.length; i++) {
     var el = els[i];
     var visible = isVisible(els[i]);
@@ -100,15 +107,40 @@ function getOutlineAsHTML() {
     } else {
       wrongLevel = false;
     }
-    var id = el.id || ('h5o-heading-' + (++idCounter));
-    el.id = id;
-    var text = '<span class="level" data-level="' + n + '"></span>' + ' ' + htmlEntities(el.textContent.replace(/\s+/g,' '));
+    result.push({
+      visible: visible,
+      visuallyhidden: visible && isVisuallyHidden(el),
+      wrong: wrongLevel,
+      level: n,
+      el: el
+    });
+  }
+  return result;
+}
+
+function countOutline(list, key) {
+  var count = 0;
+  for (var i = 0; i < list.length; i++) {
+    if (list[i][key]) count++;
+  }
+  return count;
+}
+
+
+function outlineToHTML(list) {
+  var html = '';
+
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i], el = item.el;
     html += '<li class="'
-    html += (wrongLevel ? 'wrong-level' : 'correct-level')
-    html += (visible ? '' : ' hidden')
-    html += (visible && isVisuallyHidden(el) ? ' visuallyhidden' : '')
-    html += '" style="margin-left: ' + (n) + 'em;">';
-    html += '<a href="#' + id + '" target="_top">' + text + '</a>';
+    html += (item.wrong ? 'wrong-level' : 'correct-level')
+    html += (item.visible ? '' : ' hidden')
+    html += (item.visuallyhidden ? ' visuallyhidden' : '')
+    html += '" style="margin-left: ' + (item.level) + 'em;">';
+    html += '<a href="#' + i + '" target="_top">';
+    html += '<span class="level" data-level="' + item.level + '"></span> ';
+    html += '<span class="text">' + htmlEntities(el.textContent.replace(/\s+/g,' ')) + '</span>';
+    html += '</a>';
     html += '</li>';
   }
 
