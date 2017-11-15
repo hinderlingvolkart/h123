@@ -81,6 +81,9 @@ li.wrong-level {
   color: #AF3A37;
 }
 
+a.is-active {
+  box-shadow: 0 0 5px 1px #3CBEFF;
+}
 a:hover {
     background-color: currentColor;
 }

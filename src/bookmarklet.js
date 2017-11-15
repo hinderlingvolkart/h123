@@ -35,6 +35,7 @@ iframe.onload = function () {
   var quitButton = doc.querySelector('[data-action="close"]');
   if (quitButton) {
     quitButton.addEventListener('click', function (e) {
+      disableHoverHighlight();
       window.removeEventListener('resize', updateHeight);
       document.body.removeChild(container);
       if (document.getElementById(highlighterEl.id)) {
@@ -60,6 +61,7 @@ iframe.onload = function () {
 
   switcher('o-hidden', 'show-hidden');
   switcher('o-visuallyhidden', 'mark-visuallyhidden');
+  handleHoverHighlight(doc.getElementById('o-highlight'));
 
   updateHeight();
 
@@ -155,7 +157,7 @@ function outlineToHTML(list) {
     html += '</li>';
   }
 
-  return '<ul>' + html + '</ul>';
+  return '<ul id="headings">' + html + '</ul>';
 }
 
 
@@ -207,14 +209,16 @@ function isVisuallyHidden(el) {
 
 
 
-function highlightElement(el) {
-  if (el.scrollIntoViewIfNeeded) {
-    el.scrollIntoViewIfNeeded();
-  } else
-  if (el.scrollIntoView) {
-    el.scrollIntoView();
-  } else {
+function highlightElement(el, disableAutoScroll) {
+  if (!disableAutoScroll) {
+    if (el.scrollIntoViewIfNeeded) {
+      el.scrollIntoViewIfNeeded();
+    } else
+    if (el.scrollIntoView) {
+      el.scrollIntoView();
+    } else {
 
+    }
   }
   setTimeout(function() {
     var size = el.getBoundingClientRect();
@@ -248,5 +252,62 @@ function highlightElement(el) {
     highlighterEl.style.height = (size.bottom - size.top + 20) + 'px';
     highlighterEl.style.display = 'block';
   }, 100);
+}
+
+function handleHoverHighlight(input) {
+  var handler = function() {
+    if (input.checked) {
+      enableHoverHighlight();
+    } else {
+      disableHoverHighlight();
+    }
+  }
+  handler();
+  input.addEventListener('click', handler);
+}
+
+function highlightLink(el) {
+  var links = doc.querySelectorAll('#headings a');
+  for (var k = links.length - 1; k >= 0; k--) {
+    if (links[k] === el) {
+      links[k].classList.add('is-active');
+    } else {
+      links[k].classList.remove('is-active');
+    }
+  }
+}
+
+function handleElementHover(event) {
+    var target = event.target;
+    var all = document.body.querySelectorAll('*');
+    var searchHeading = false;
+    for (var i = all.length - 1; i >= 0; i--) {
+      var el = all[i];
+      if (searchHeading) {
+        for (var j = outline.length - 1; j >= 0; j--) {
+          if (outline[j].el === el && outline[j].visible) {
+            // yeah, found heading
+            highlightElement(outline[j].el, true);
+            highlightLink(doc.querySelector('#headings a[href="#' + j + '"]'));
+            return;
+          }
+        }
+      } else {
+        if (el === target) {
+          searchHeading = true;
+          i++; // also handle the current element
+        }
+      }
+    }
+    highlightLink(null);
+  }
+
+function enableHoverHighlight() {
+  document.body.addEventListener('mouseover', handleElementHover);
+
+}
+
+function disableHoverHighlight() {
+  document.body.removeEventListener('mouseover', handleElementHover);
 }
 
