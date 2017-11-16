@@ -4,14 +4,23 @@
 	<meta charset="utf-8">
 	<title>h123 - An bookmarklet that shows headings like a screenreader (Accessbility)</title>
 	<style>
+    html {
+      font-size: 100%;
+    }
+    @media (max-width: 600px) {
+      html {
+        font-size: 85%;
+      }
+    }
 		body {
-			font:  bold 3vw/1.4 "Helvetica Neue", Helvetica, Arial;
-			padding:  40px;
-			padding:  20vmin;
-			text-align: center;
+			font:  bold 1.3rem/1.4 "Helvetica Neue", Helvetica, Arial;
+			max-width: 30em;
+      margin: 0 auto;
+      padding: 20px;
+      padding-bottom: 50px;
 		}
     h1 {
-      font-size: 5vw;
+      font-size: 3rem;
     }
 		a {
 			text-decoration: none;
@@ -21,19 +30,15 @@
       display: inline-block;
       margin-bottom: .1em;
 		}
+    pre {
+      background: #f6f6f6;
+      padding: 20px;
+      font-weight: normal;
+      font-size: 1.1rem;
+    }
 	</style>
 </head>
 <body>
-  <h1>h①②③</h1>
-  <h1>See the headings like a screenreader</h1>
-	<p>
-		Add to your bookmarks:
-		<br><br>
-		<a href="{{bookmarklet}}">Show Headings</a>
-		<br><br>
-		<a class="emoticon" href="{{bookmarklet}}">h①②③</a>
-    <a class="emoticon" href="{{bookmarklet}}">H1️⃣2️⃣3️⃣</a>
-    <a class="emoticon" href="{{bookmarklet}}">h⓵⓶⓷</a>
-    <a class="emoticon" href="{{bookmarklet}}">h❶❷❸</a>
+  {{content}}
 </body>
 </html>

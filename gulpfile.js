@@ -28,11 +28,17 @@ function prepareJSVariable(str) {
   return str;
 }
 
-gulp.task('readme', ['compile'], function() {
-  return gulp.src('src/readme.html')
-    .pipe(replace('{{bookmarklet}}', getBookmarklet()))
-    .pipe(rename('index.html'))
-    .pipe(gulp.dest('docs'))
+gulp.task('readme', ['compile'], function(cb) {
+  var marked = require('marked');
+  var markdown = fs.readFileSync('src/readme.md', 'utf8');
+  markdown = markdown.split('{{bookmarklet}}').join(getBookmarklet());
+  fs.writeFileSync('./readme.md', markdown, 'utf8');
+
+  var html = fs.readFileSync('src/readme.html', 'utf8');
+  html = html.split('{{content}}').join(marked(markdown));
+  fs.writeFileSync('docs/index.html', html, 'utf8');
+
+  cb();
 });
 
 
