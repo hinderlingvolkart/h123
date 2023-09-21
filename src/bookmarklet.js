@@ -108,7 +108,7 @@ function updateHeight() {
 }
 function getOutline() {
   var previousLevel = 0;
-  var els = document.querySelectorAll('h1,h2,h3,h4,h5,h6,h7,[role="heading"]');
+  var els = customQuerySelectorAll(document, ':is(h1,h2,h3,h4,h5,h6,h7,[role="heading"]):not([role="presentation"])');
   var result = [];
   for (var i = 0; i < els.length; i++) {
     var el = els[i];
@@ -152,7 +152,7 @@ function outlineToHTML(list) {
     html += '" style="margin-left: ' + (item.level) + 'em;">';
     html += '<a href="#' + i + '" target="_top">';
     html += '<span class="level" data-level="' + item.level + '"></span> ';
-    html += '<span class="text">' + htmlEntities(el.textContent.replace(/\s+/g,' ')) + '</span>';
+    html += '<span class="text">' + htmlEntities(textContent(el).replace(/\s+/g,' ')) + '</span>';
     html += '</a>';
     html += '</li>';
   }
@@ -167,32 +167,10 @@ function htmlEntities(str) {
 
 
 function isVisible(el) {
-  var css = window.getComputedStyle(el);
-  var cssVisible = false;
-  while (el) {
-    if (css['display'] === 'none') {
-      return false;
-    }
-    if (!cssVisible) {
-      if (css['visibility'] === 'hidden') {
-        return false;
-      }
-      if (css['visibility'] === 'visible') {
-        cssVisible = true;
-      }
-    }
-    if (el.getAttribute('aria-hidden') === 'true') {
-      return false;
-    }
-    el = el.parentElement;
-    try {
-      css = window.getComputedStyle(el);
-    } catch (error) {
-      return true; // happens on window element
-    }
-  }
-  return true;
+  return el.offsetParent !== null;
 }
+
+
 
 function isVisuallyHidden(el) {
   var size = el.getBoundingClientRect(el);
@@ -311,3 +289,53 @@ function disableHoverHighlight() {
   document.body.removeEventListener('mouseover', handleElementHover);
 }
 
+
+
+/**
+ * Find DOM nodes everywhere, traversing any shadow boundaries
+ * Based on https://stackoverflow.com/a/71666543
+ *
+ * @param {HTMLElement} node 
+ * @param {String} selector 
+ * @returns {HTMLElement[]}
+ */
+function customQuerySelectorAll(node, selector) {
+  const nodes = [];
+  const nodeIterator = document.createNodeIterator(node, Node.ELEMENT_NODE);
+  let currentNode;
+
+  while (currentNode = nodeIterator.nextNode()) {
+    if (currentNode.matches(selector)) {
+      nodes.push(currentNode);
+    } else if (currentNode.shadowRoot) {
+      nodes.push(...customQuerySelectorAll(currentNode.shadowRoot, selector));
+    }
+  }
+
+  return nodes;
+}
+
+/**
+ * Find text content, including slotted text
+ *
+ * TODO: Handle any order of slots and text nodes
+ *
+ * @param {HTMLElement} el 
+ * @returns {String}
+ */
+function textContent(el) {
+  const parts = [el.textContent];
+  const slots = el.querySelectorAll('slot')
+  
+  for (const slot of slots) {
+    const nodes = slot.assignedNodes();
+
+    for (const node of nodes) {
+      parts.push(node.textContent);
+    }
+  }
+
+  const textContent = parts.filter(Boolean).join(' ');
+
+  return textContent;
+}
