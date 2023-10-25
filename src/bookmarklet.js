@@ -167,7 +167,32 @@ function htmlEntities(str) {
 
 
 function isVisible(el) {
-  return el.offsetParent !== null;
+  var css = window.getComputedStyle(el);
+  var cssVisible = false;
+  while (el) {
+    if (css['display'] === 'none') {
+      return false;
+    }
+    if (!cssVisible) {
+      if (css['visibility'] === 'hidden') {
+        return false;
+      }
+      if (css['visibility'] === 'visible') {
+        cssVisible = true;
+      }
+    }
+    if (el.getAttribute('aria-hidden') === 'true') {
+      return false;
+    }
+    var node = el.assignedSlot || el;
+    el = node.parentElement || node.getRootNode().host;
+    try {
+      css = window.getComputedStyle(el);
+    } catch (error) {
+      return true; // happens on window element
+    }
+  }
+  return true;
 }
 
 
