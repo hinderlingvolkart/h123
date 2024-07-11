@@ -1,5 +1,7 @@
 # h①②③ – Accessibility HTML5 Outliner
 
+v1.1
+
 See the headings like a screenreader!
 
 ## Add to your bookmarks
@@ -21,8 +23,8 @@ If you are a web developer, you might have heard of sectioning content. Those we
       <aside>
         <h1>Some advertising in between</h1>
         <a href="https://www.chocoloco.com">
-          <img 
-            src="advertising-animated.gif" 
+          <img
+            src="advertising-animated.gif"
             alt="Some fancy sweet chocolate drink"
             >
         </a>
@@ -52,8 +54,8 @@ The new HTML 5.2 spec takes a step back and now recommends to always set your h1
       <aside>
         <h2>Some advertising in between</h2>
         <a href="https://www.chocoloco.com">
-          <img 
-            src="advertising-animated.gif" 
+          <img
+            src="advertising-animated.gif"
             alt="Some fancy sweet chocolate drink"
             >
         </a>
@@ -69,6 +71,5 @@ The new HTML 5.2 spec takes a step back and now recommends to always set your h1
 Thing is that many people don't know. Some outliners show the structure of the whole document, including hidden parts. But guess what, screenreaders only read what's visible. Yeah, funny thing, right. If you think about it, it makes just sense though. So this outliner will only consider headings that are actually visible, at least visible to the screenreader. (because you can visually hide elements that stay theoretically visible).
 
 Our bookmarklet to the rescue!! :-)
-
 
 [1]: {{bookmarklet}}
