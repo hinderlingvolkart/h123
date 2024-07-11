@@ -1,28 +1,27 @@
 {
-  "name": "h123",
-  "version": "0.0.1",
-  "description": "A bookmarklet to see accessible headings like a screenreader",
-  "scripts": {
-    "start": "gulp work"
-  },
-  "main": "src/index.js",
-  "dependencies": {
-    "autoprefixer": "^7.1.6",
-    "gulp": "^3.9.1",
-    "gulp-postcss": "^7.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.6.1",
-    "gulp-uglify": "^3.0.0",
-    "jszip": "^3.1.5",
-    "marked": "^0.3.6",
-    "mkpath": "^1.0.0",
-    "postcss-js": "^1.0.1"
-  },
-  "browserslist": [
-    "defaults",
-    "> 1%",
-    "iOS >= 8.4"
-  ],
-  "author": "Hinderling Volkart AG",
-  "license": "UNLICENSED"
+	"name": "h123",
+	"version": "0.0.1",
+	"description": "A bookmarklet to see accessible headings like a screenreader",
+	"scripts": {
+		"start": "gulp work"
+	},
+	"type": "module",
+	"main": "src/index.js",
+	"dependencies": {
+		"@babel/core": "^7.24.7",
+		"@babel/preset-env": "^7.24.7",
+		"autoprefixer": "^10.4.19",
+		"jszip": "^3.1.5",
+		"marked": "^13.0.2",
+		"mkpath": "^1.0.0",
+		"postcss": "^8.4.39",
+		"terser": "^5.31.2"
+	},
+	"browserslist": [
+		"defaults",
+		"> 1%",
+		"iOS >= 8.4"
+	],
+	"author": "Hinderling Volkart AG",
+	"license": "UNLICENSED"
 }
