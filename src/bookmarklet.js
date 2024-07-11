@@ -26,7 +26,7 @@ var doc;
 
 container.appendChild(iframe);
 iframe.onload = function () {
-  iframe.onload = function () {};
+  iframe.onload = function () { };
   doc = iframe.contentWindow.document;
   doc.open();
   doc.write('{{ui}}');
@@ -65,7 +65,7 @@ iframe.onload = function () {
 
   updateHeight();
 
-  doc.addEventListener('mouseover', function(event) {
+  doc.addEventListener('mouseover', function (event) {
     var link;
     if (event.target.nodeName.toUpperCase() === 'A') {
       link = event.target;
@@ -84,7 +84,7 @@ iframe.onload = function () {
     var checkbox = doc.getElementById(id);
     var target = doc.querySelector('.result');
     if (checkbox) {
-      var check = function(e) {
+      var check = function (e) {
         if (checkbox.checked) {
           target.classList.add(className);
         } else {
@@ -113,7 +113,7 @@ function getOutline() {
   for (var i = 0; i < els.length; i++) {
     var el = els[i];
     var visible = isVisible(els[i]);
-    var n = parseInt((el.getAttribute('role') == 'heading' && el.getAttribute('aria-level')) || el.nodeName.substr(1));
+    var n = parseInt(el.getAttribute('aria-level') || el.nodeName.charAt(1));
     if (visible) {
       var wrongLevel = n > previousLevel && n !== (previousLevel + 1);
       previousLevel = n;
@@ -152,7 +152,7 @@ function outlineToHTML(list) {
     html += '" style="margin-left: ' + (item.level) + 'em;">';
     html += '<a href="#' + i + '" target="_top">';
     html += '<span class="level" data-level="' + item.level + '"></span> ';
-    html += '<span class="text">' + htmlEntities(textContent(el).replace(/\s+/g,' ')) + '</span>';
+    html += '<span class="text">' + htmlEntities(textContent(el).replace(/\s+/g, ' ')) + '</span>';
     html += '</a>';
     html += '</li>';
   }
@@ -162,7 +162,7 @@ function outlineToHTML(list) {
 
 
 function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 
@@ -217,13 +217,13 @@ function highlightElement(el, disableAutoScroll) {
     if (el.scrollIntoViewIfNeeded) {
       el.scrollIntoViewIfNeeded();
     } else
-    if (el.scrollIntoView) {
-      el.scrollIntoView();
-    } else {
+      if (el.scrollIntoView) {
+        el.scrollIntoView();
+      } else {
 
-    }
+      }
   }
-  setTimeout(function() {
+  setTimeout(function () {
     var size = el.getBoundingClientRect();
     var visible = true, parent = el.parentElement;
     while (!size.height && !size.width && !size.left && !size.top && parent) {
@@ -258,7 +258,7 @@ function highlightElement(el, disableAutoScroll) {
 }
 
 function handleHoverHighlight(input) {
-  var handler = function() {
+  var handler = function () {
     if (input.checked) {
       enableHoverHighlight();
     } else {
@@ -281,29 +281,29 @@ function highlightLink(el) {
 }
 
 function handleElementHover(event) {
-    var target = event.target;
-    var all = document.body.querySelectorAll('*');
-    var searchHeading = false;
-    for (var i = all.length - 1; i >= 0; i--) {
-      var el = all[i];
-      if (searchHeading) {
-        for (var j = outline.length - 1; j >= 0; j--) {
-          if (outline[j].el === el && outline[j].visible) {
-            // yeah, found heading
-            highlightElement(outline[j].el, true);
-            highlightLink(doc.querySelector('#headings a[href="#' + j + '"]'));
-            return;
-          }
-        }
-      } else {
-        if (el === target) {
-          searchHeading = true;
-          i++; // also handle the current element
+  var target = event.target;
+  var all = document.body.querySelectorAll('*');
+  var searchHeading = false;
+  for (var i = all.length - 1; i >= 0; i--) {
+    var el = all[i];
+    if (searchHeading) {
+      for (var j = outline.length - 1; j >= 0; j--) {
+        if (outline[j].el === el && outline[j].visible) {
+          // yeah, found heading
+          highlightElement(outline[j].el, true);
+          highlightLink(doc.querySelector('#headings a[href="#' + j + '"]'));
+          return;
         }
       }
+    } else {
+      if (el === target) {
+        searchHeading = true;
+        i++; // also handle the current element
+      }
     }
-    highlightLink(null);
   }
+  highlightLink(null);
+}
 
 function enableHoverHighlight() {
   document.body.addEventListener('mouseover', handleElementHover);
@@ -351,7 +351,7 @@ function customQuerySelectorAll(node, selector) {
 function textContent(el) {
   const parts = [el.textContent];
   const slots = el.querySelectorAll('slot')
-  
+
   for (const slot of slots) {
     const nodes = slot.assignedNodes();
 
