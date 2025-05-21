@@ -116,6 +116,13 @@ function getOutline() {
     var n = parseInt(el.getAttribute('aria-level') || el.nodeName.charAt(1));
     if (visible) {
       var wrongLevel = n > previousLevel && n !== (previousLevel + 1);
+
+      // the first heading can be h1 or h2
+      // see https://www.w3.org/WAI/tutorials/page-structure/headings/ (Example 2)
+      // (they don't say it can't be h3, but that would not make sense)
+      if (previousLevel === 0) {
+        wrongLevel = n > 2
+      }
       previousLevel = n;
     } else {
       wrongLevel = false;
