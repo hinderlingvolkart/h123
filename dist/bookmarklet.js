@@ -7,6 +7,8 @@ function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) 
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+// This placeholder will be replaced by build.js with the actual CSS string.
+var SCRIPT_INJECTED_CSS = " * { margin: 0; padding: 0; border: 0; } body { font: 14px/1.6 sans; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"; color: #284900; background: rgba(255,255,255,0.95); white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis; padding: 15px; padding-bottom: 30px; } ul { margin: 0 0 0 -10px; padding: 0; } li { color: #284900; list-style: none; margin-left: 20px; display: -webkit-flex; display: flex; } a { color: inherit; text-decoration: none; display: inline-block; max-width: 30em; overflow: hidden; text-overflow: ellipsis; padding: 2px 4px 2px 25px; position: relative; line-height: 1.3; border-radius: 3px; } a > .level { display: inline-block; background-color: currentColor; font-size: 85%; font-weight: bold; width: 2.7ex; height: 2.7ex; text-align: center; box-sizing: border-box; position: absolute; left: 2px; top: 2px; padding-top: 1px; } a > .level:before { content: attr(data-level); color: white; } li.hidden { color: black; text-decoration: line-through; opacity: 0.5; } .result:not(.show-hidden) li.hidden { display: none; } .result.mark-visuallyhidden li.visuallyhidden .level:before { color: inherit; } .result.mark-visuallyhidden li.visuallyhidden .level { border: 1px dashed; background: white; } li.wrong-level { color: #AF3A37; } a.is-active { box-shadow: 0 0 5px 1px #3CBEFF; } a:hover { background-color: currentColor; } a:hover > .text { color: white; } a:hover > .level { background-color: transparent; } header { padding-top: 5px; padding-bottom: 15px; padding-right: 5em; margin-bottom: 1em; border-bottom: 1px solid #eee; } legend { margin-right: 1em; font-weight: bold; } @media (min-width: 340px) { legend { float: left; } } .options { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; } .options .input { margin-right: 2em; } .count { background: #ddd; border-radius: 4px; padding: 1px 3px; } .tooltip { position: relative; } .tooltip:before { content: \'ℹ️\'; } .tooltip:focus:after, .tooltip:hover:after { content: attr(title); position: absolute; background: white; padding: 4px 10px; top: 70%; left: 70%; width: 10em; box-shadow: 0 2px 20px rgba(0,0,0,0.3); white-space: normal; border-radius: 8px; border-top-left-radius: 0; z-index: 1; pointer-events: none; } .button-close { position: absolute; top: 15px; right: 15px; padding: 5px 10px; border-radius: 5px; border: 0; font-size: inherit; color: white; background-color: #284900; cursor: pointer; } .button-close:hover { color: white; background-color: #284900; } ";
 var containerId = 'a11y-bookmarklet';
 var containerStyle = 'position: fixed; top: 0; right: 0; max-height: 100%; box-shadow: 0 0 80px rgba(0,0,0,0.3); width: 20%; min-width: 320px; max-width: 450px; z-index: 1000001;';
 var highlighterEl = document.createElement('DIV');
@@ -27,13 +29,30 @@ iframe.style.height = '100%';
 iframe.style.borderWidth = '0';
 var outline = getOutline();
 var doc;
+iframe.srcdoc = '<html> <head> <meta name=\"viewport\" content=\"width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes\"> </head> <body> <header> <button class=\"button-close\" data-action=\"close\">Close</button> <fieldset> <legend>Options</legend> <div class=\"options\"> <div class=\"input\"> <input type=\"checkbox\" name=\"options\" id=\"o-hidden\"> <label for=\"o-hidden\">Show hidden <span class=\"count\" id=\"o-hidden-count\"></span> <span class=\"tooltip\" title=\"also hidden for screenreaders\" tabindex=\"0\"></span></label> </div> <div class=\"input\"> <input type=\"checkbox\" name=\"options\" id=\"o-visuallyhidden\"> <label for=\"o-visuallyhidden\">Mark visually hidden <span class=\"count\" id=\"o-visuallyhidden-count\"></span> <span class=\"tooltip\" title=\"only visible for screenreaders\" tabindex=\"0\"></span></label> </div> <div class=\"input\"> <input type=\"checkbox\" name=\"options\" id=\"o-highlight\"> <label for=\"o-highlight\">Hover-Highlight <span class=\"tooltip\" title=\"Highlight the corresponding heading when hovering over elements of the page\" tabindex=\"0\"></span></label> </div> </div> </fieldset> </header> <main id=\"result\" class=\"result\"> </main> </body> </html> ';
+// allow-scripts: To allow running scripts inside the iframe (e.g., for the close button and other UI interactions).
+// allow-same-origin: When srcdoc is used, the iframe generally inherits the parent's origin.
+//   This flag ensures that scripts within the iframe can fully access their own document and resources as if they were from that origin.
+//   It's important for the bookmarklet's internal JavaScript to function correctly.
+// allow-forms: If there were any forms inside the bookmarklet UI, this would be needed. Not currently the case.
+// allow-popups: If the bookmarklet UI needed to open new windows/tabs. Not currently the case.
+// allow-modals: If the bookmarklet UI needed to open modals. Not currently the case.
+iframe.sandbox = 'allow-scripts allow-same-origin';
 container.appendChild(iframe);
 iframe.onload = function () {
-  iframe.onload = function () {};
+  // No longer need the redundant iframe.onload = function () { };
   doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write('<html> <head> <meta name="viewport" content="width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes"> <style> * { margin: 0; padding: 0; border: 0; } body { font: 14px/1.6 sans; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #284900; background: rgba(255,255,255,0.95); white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis; padding: 15px; padding-bottom: 30px; } ul { margin: 0 0 0 -10px; padding: 0; } li { color: #284900; list-style: none; margin-left: 20px; display: -webkit-flex; display: flex; } a { color: inherit; text-decoration: none; display: inline-block; max-width: 30em; overflow: hidden; text-overflow: ellipsis; padding: 2px 4px 2px 25px; position: relative; line-height: 1.3; border-radius: 3px; } a > .level { display: inline-block; background-color: currentColor; font-size: 85%; font-weight: bold; width: 2.7ex; height: 2.7ex; text-align: center; box-sizing: border-box; position: absolute; left: 2px; top: 2px; padding-top: 1px; } a > .level:before { content: attr(data-level); color: white; } li.hidden { color: black; text-decoration: line-through; opacity: 0.5; } .result:not(.show-hidden) li.hidden { display: none; } .result.mark-visuallyhidden li.visuallyhidden .level:before { color: inherit; } .result.mark-visuallyhidden li.visuallyhidden .level { border: 1px dashed; background: white; } li.wrong-level { color: #AF3A37; } a.is-active { box-shadow: 0 0 5px 1px #3CBEFF; } a:hover { background-color: currentColor; } a:hover > .text { color: white; } a:hover > .level { background-color: transparent; } header { padding-top: 5px; padding-bottom: 15px; padding-right: 5em; margin-bottom: 1em; border-bottom: 1px solid #eee; } legend { margin-right: 1em; font-weight: bold; } @media (min-width: 340px) { legend { float: left; } } .options { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; } .options .input { margin-right: 2em; } .count { background: #ddd; border-radius: 4px; padding: 1px 3px; } .tooltip { position: relative; } .tooltip:before { content: \'ℹ️\'; } .tooltip:focus:after, .tooltip:hover:after { content: attr(title); position: absolute; background: white; padding: 4px 10px; top: 70%; left: 70%; width: 10em; box-shadow: 0 2px 20px rgba(0,0,0,0.3); white-space: normal; border-radius: 8px; border-top-left-radius: 0; z-index: 1; pointer-events: none; } .button-close { position: absolute; top: 15px; right: 15px; padding: 5px 10px; border-radius: 5px; border: 0; font-size: inherit; color: white; background-color: #284900; cursor: pointer; } .button-close:hover { color: white; background-color: #284900; } </style> </head> <body> <header> <button class="button-close" data-action="close">Close</button> <fieldset> <legend>Options</legend> <div class="options"> <div class="input"> <input type="checkbox" name="options" id="o-hidden"> <label for="o-hidden">Show hidden <span class="count" id="o-hidden-count"></span> <span class="tooltip" title="also hidden for screenreaders" tabindex="0"></span></label> </div> <div class="input"> <input type="checkbox" name="options" id="o-visuallyhidden"> <label for="o-visuallyhidden">Mark visually hidden <span class="count" id="o-visuallyhidden-count"></span> <span class="tooltip" title="only visible for screenreaders" tabindex="0"></span></label> </div> <div class="input"> <input type="checkbox" name="options" id="o-highlight"> <label for="o-highlight">Hover-Highlight <span class="tooltip" title="Highlight the corresponding heading when hovering over elements of the page" tabindex="0"></span></label> </div> </div> </fieldset> </header> <main id="result" class="result"> </main> </body> </html> ');
-  doc.close();
+  // doc.open(), doc.write(), doc.close() are no longer needed with srcdoc.
+
+  // Inject the CSS programmatically
+  if (doc.head) {
+    var styleEl = doc.createElement('style');
+    styleEl.textContent = SCRIPT_INJECTED_CSS;
+    doc.head.appendChild(styleEl);
+  } else {
+    // Fallback or error for environments where doc.head is not available immediately
+    console.error("Bookmarklet: iframe document head not found for CSS injection.");
+  }
   var quitButton = doc.querySelector('[data-action="close"]');
   if (quitButton) {
     quitButton.addEventListener('click', function (e) {
@@ -105,11 +124,17 @@ function getOutline() {
     var el = els[i];
     var visible = isVisible(els[i]);
     var n = parseInt(el.getAttribute('aria-level') || el.nodeName.charAt(1));
+    var wrongLevel = false; // Default to false
     if (visible) {
-      var wrongLevel = n > previousLevel && n !== previousLevel + 1;
+      // The first heading can only be h1 or h2 (n <= 2 when previousLevel === 0)
+      // For subsequent headings, they cannot skip levels (n <= previousLevel + 1)
+      // See https://www.w3.org/WAI/tutorials/page-structure/headings/ (Example 2)
+      // (they don't say it can't be h3, but that would not make sense)
+      wrongLevel = previousLevel === 0 ? n > 2 : n > previousLevel + 1;
       previousLevel = n;
     } else {
-      wrongLevel = false;
+      // Non-visible headings are not considered for level validation in this context.
+      // wrongLevel remains false, as initialized.
     }
     result.push({
       visible: visible,

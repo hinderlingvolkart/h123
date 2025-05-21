@@ -35,7 +35,8 @@ function getPackageConfig() {
 
 function prepareJSVariable(str) {
     str = str.replace(/\s+/g, ' ');
-    str = str.replace(/'/g, '\\\'');
+    str = str.replace(/"/g, '\\"');
+    str = str.replace(/'/g, "\\'");
     return str;
 }
 
@@ -81,7 +82,7 @@ async function compile() {
     const css = readFile('src/bookmarklet.ui.css');
 
     const cssResult = await postcss([autoprefixer]).process(css, { from: undefined });
-    
+
     // Remove the <style>{{css}}</style> block from the HTML template.
     // This makes the HTML purely structural.
     html = html.replace('<style>{{css}}</style>', '');
