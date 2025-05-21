@@ -1,23 +1,24 @@
 {
-    "background": {
-        "scripts": ["background.js"]
-    },
-    "browser_action": {
-        "default_icon": "icon-128.png",
-        "default_title": "{{name}}"
-    },
+    "manifest_version": 3,
     "name": "{{name}}",
+    "version": "{{version}}",
     "description": "{{description}}",
     "homepage_url": "{{homepage}}",
     "icons": {
         "16": "icon-16.png",
         "48": "icon-48.png",
-    "128": "icon-128.png" },
+        "128": "icon-128.png"
+    },
+    "action": {
+        "default_icon": "icon-128.png",
+        "default_title": "{{name}}"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
     "permissions": [
-        "tabs",
+        "scripting",
         "http://*/*",
         "https://*/*"
-    ],
-    "version": "{{version}}",
-    "manifest_version": 2
+    ]
 }

@@ -1,4 +1,7 @@
 
+// This placeholder will be replaced by build.js with the actual CSS string.
+var SCRIPT_INJECTED_CSS = "/* {{css_string_placeholder}} */";
+
 var containerId = 'a11y-bookmarklet';
 var containerStyle = 'position: fixed; top: 0; right: 0; max-height: 100%; box-shadow: 0 0 80px rgba(0,0,0,0.3); width: 20%; min-width: 320px; max-width: 450px; z-index: 1000001;';
 
@@ -24,13 +27,31 @@ iframe.style.borderWidth = '0';
 var outline = getOutline();
 var doc;
 
+iframe.srcdoc = '{{ui}}';
+// allow-scripts: To allow running scripts inside the iframe (e.g., for the close button and other UI interactions).
+// allow-same-origin: When srcdoc is used, the iframe generally inherits the parent's origin.
+//   This flag ensures that scripts within the iframe can fully access their own document and resources as if they were from that origin.
+//   It's important for the bookmarklet's internal JavaScript to function correctly.
+// allow-forms: If there were any forms inside the bookmarklet UI, this would be needed. Not currently the case.
+// allow-popups: If the bookmarklet UI needed to open new windows/tabs. Not currently the case.
+// allow-modals: If the bookmarklet UI needed to open modals. Not currently the case.
+iframe.sandbox = 'allow-scripts allow-same-origin';
+
 container.appendChild(iframe);
 iframe.onload = function () {
-  iframe.onload = function () { };
+  // No longer need the redundant iframe.onload = function () { };
   doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write('{{ui}}');
-  doc.close();
+  // doc.open(), doc.write(), doc.close() are no longer needed with srcdoc.
+
+  // Inject the CSS programmatically
+  if (doc.head) {
+    var styleEl = doc.createElement('style');
+    styleEl.textContent = SCRIPT_INJECTED_CSS;
+    doc.head.appendChild(styleEl);
+  } else {
+    // Fallback or error for environments where doc.head is not available immediately
+    console.error("Bookmarklet: iframe document head not found for CSS injection.");
+  }
 
   var quitButton = doc.querySelector('[data-action="close"]');
   if (quitButton) {
@@ -114,11 +135,15 @@ function getOutline() {
     var el = els[i];
     var visible = isVisible(els[i]);
     var n = parseInt(el.getAttribute('aria-level') || el.nodeName.charAt(1));
+    var wrongLevel = false; // Default to false
     if (visible) {
-      var wrongLevel = n > previousLevel && n !== (previousLevel + 1);
-      previousLevel = n;
+      // A heading level is considered wrong if it's not the first heading (previousLevel !== 0)
+      // AND it skips one or more levels downwards (n > previousLevel + 1).
+      wrongLevel = previousLevel !== 0 && n > (previousLevel + 1);
+      previousLevel = n; // Update previousLevel with the current heading's level for the next iteration
     } else {
-      wrongLevel = false;
+      // Non-visible headings are not considered for level validation in this context.
+      // wrongLevel remains false, as initialized.
     }
     result.push({
       visible: visible,

@@ -77,14 +77,21 @@ async function buildChromeExtension() {
 }
 
 async function compile() {
-    const html = readFile('src/bookmarklet.ui.html');
+    let html = readFile('src/bookmarklet.ui.html');
     const css = readFile('src/bookmarklet.ui.css');
 
     const cssResult = await postcss([autoprefixer]).process(css, { from: undefined });
-    const updatedHtml = html.replace('{{css}}', cssResult.css);
+    
+    // Remove the <style>{{css}}</style> block from the HTML template.
+    // This makes the HTML purely structural.
+    html = html.replace('<style>{{css}}</style>', '');
 
     let bookmarkletJS = readFile('src/bookmarklet.js');
-    bookmarkletJS = bookmarkletJS.replace('{{ui}}', prepareJSVariable(updatedHtml));
+    // Inject the structural HTML into the {{ui}} placeholder
+    bookmarkletJS = bookmarkletJS.replace('{{ui}}', prepareJSVariable(html));
+    // Inject the processed CSS into the /* {{css_string_placeholder}} */ placeholder
+    // We use prepareJSVariable to ensure the CSS string is properly escaped for JS.
+    bookmarkletJS = bookmarkletJS.replace('/* {{css_string_placeholder}} */', prepareJSVariable(cssResult.css));
 
     const transformedJS = transformSync(bookmarkletJS, { presets: ['@babel/preset-env'] }).code;
 
