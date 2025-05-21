@@ -1,4 +1,3 @@
-
 // This placeholder will be replaced by build.js with the actual CSS string.
 var SCRIPT_INJECTED_CSS = "/* {{css_string_placeholder}} */";
 
@@ -137,10 +136,12 @@ function getOutline() {
     var n = parseInt(el.getAttribute('aria-level') || el.nodeName.charAt(1));
     var wrongLevel = false; // Default to false
     if (visible) {
-      // A heading level is considered wrong if it's not the first heading (previousLevel !== 0)
-      // AND it skips one or more levels downwards (n > previousLevel + 1).
-      wrongLevel = previousLevel !== 0 && n > (previousLevel + 1);
-      previousLevel = n; // Update previousLevel with the current heading's level for the next iteration
+      // The first heading can only be h1 or h2 (n <= 2 when previousLevel === 0)
+      // For subsequent headings, they cannot skip levels (n <= previousLevel + 1)
+      // See https://www.w3.org/WAI/tutorials/page-structure/headings/ (Example 2)
+      // (they don't say it can't be h3, but that would not make sense)
+      wrongLevel = previousLevel === 0 ? n > 2 : n > (previousLevel + 1);
+      previousLevel = n;
     } else {
       // Non-visible headings are not considered for level validation in this context.
       // wrongLevel remains false, as initialized.
