@@ -3,7 +3,7 @@
 	"version": "1.1.0",
 	"description": "A bookmarklet to see accessible headings like a screenreader",
 	"scripts": {
-		"start": "gulp work"
+		"build": "node build.js"
 	},
 	"type": "module",
 	"main": "src/index.js",
