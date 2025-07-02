@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { dirname } from 'path';
+import { execSync } from 'child_process';
 import mkpath from 'mkpath';
 import JSZip from 'jszip';
 import postcss from 'postcss';
@@ -76,6 +77,18 @@ async function buildChromeExtension() {
     writeFileSync('./dist/AccessibilityOutlinerChrome.zip', content);
 }
 
+function compileTypeScript() {
+    try {
+        // Compile TypeScript to JavaScript
+        console.log('Compiling TypeScript...');
+        execSync('npx tsc --outDir ./temp --skipLibCheck --target ES2015 --lib DOM,ES2015 --strict --esModuleInterop src/bookmarklet.ts', { stdio: 'inherit' });
+        return readFile('temp/bookmarklet.js');
+    } catch (error) {
+        console.error('TypeScript compilation failed:', error.message);
+        throw error;
+    }
+}
+
 async function compile() {
     const html = readFile('src/bookmarklet.ui.html');
     const css = readFile('src/bookmarklet.ui.css');
@@ -83,9 +96,13 @@ async function compile() {
     const cssResult = await postcss([autoprefixer]).process(css, { from: undefined });
     const updatedHtml = html.replace('{{css}}', cssResult.css);
 
-    let bookmarkletJS = readFile('src/bookmarklet.js');
+    // Compile TypeScript to JavaScript
+    let bookmarkletJS = compileTypeScript();
+    
+    // Replace the UI template
     bookmarkletJS = bookmarkletJS.replace('{{ui}}', prepareJSVariable(updatedHtml));
 
+    // Transform with Babel for additional browser compatibility
     const transformedJS = transformSync(bookmarkletJS, { presets: ['@babel/preset-env'] }).code;
 
     writeFile('./dist/bookmarklet.js', transformedJS);
@@ -93,6 +110,13 @@ async function compile() {
     const minifiedJS = (await minify(transformedJS)).code;
 
     writeFile('./dist/bookmarklet.min.js', minifiedJS);
+    
+    // Clean up temporary files
+    try {
+        execSync('rm -rf ./temp', { stdio: 'inherit' });
+    } catch (error) {
+        // Ignore cleanup errors
+    }
 }
 
 async function build() {
