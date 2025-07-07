@@ -14,7 +14,7 @@ function readFile(dst) {
 }
 
 function writeFile(dst, content) {
-    mkpath(dirname(dst));
+    mkpath.sync(dirname(dst));
     return writeFileSync(dst, content, 'utf8');
 }
 
@@ -98,19 +98,20 @@ async function compile() {
 
     // Compile TypeScript to JavaScript
     let bookmarkletJS = compileTypeScript();
-    
+
     // Replace the UI template
     bookmarkletJS = bookmarkletJS.replace('{{ui}}', prepareJSVariable(updatedHtml));
 
     // Transform with Babel for additional browser compatibility
     const transformedJS = transformSync(bookmarkletJS, { presets: ['@babel/preset-env'] }).code;
 
+    // Create dist directory if it doesn't exist
     writeFile('./dist/bookmarklet.js', transformedJS);
 
     const minifiedJS = (await minify(transformedJS)).code;
 
     writeFile('./dist/bookmarklet.min.js', minifiedJS);
-    
+
     // Clean up temporary files
     try {
         execSync('rm -rf ./temp', { stdio: 'inherit' });
