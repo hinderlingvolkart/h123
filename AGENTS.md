@@ -2,21 +2,29 @@
 
 ### Project overview
 
-h123 is an accessibility HTML5 heading outliner — a browser bookmarklet and Chrome extension that shows the heading structure of a page as a screenreader would see it. It is a pure client-side tool with a Node.js build pipeline. There are no backend services, databases, or API secrets.
+h123 is an accessibility HTML5 heading outliner — a browser bookmarklet and cross-browser extension (Chrome, Firefox, Safari) that shows the heading structure of a page as a screenreader would see it. Pure client-side tool with a Node.js build pipeline. No backend services, databases, or API secrets.
 
 ### Build
 
-- `yarn build` runs `node build.js`, which compiles, transpiles (Babel), minifies (Terser), and packages everything into `dist/`.
-- Build outputs: `dist/bookmarklet.js`, `dist/bookmarklet.min.js`, `dist/AccessibilityOutlinerChrome.zip`, and `docs/index.html`.
+- `yarn build` runs `node build.js`, which compiles, transpiles (Babel), minifies (Terser), packages extensions, and generates the GitHub Pages site into `docs/`.
+- Build outputs (all in `dist/`, gitignored): `bookmarklet.js`, `bookmarklet.min.js`, `h123-chrome.zip`, `h123-firefox.zip`. Also generates `docs/index.html` (gitignored).
+- `readme.md` is hand-written (not generated). The Pages content template is `src/readme.md`.
 - The browserslist "caniuse-lite is outdated" warning is cosmetic and does not affect the build.
 
-### Testing the bookmarklet
+### CI
+
+- Push to `main` triggers `.github/workflows/build.yml`: builds and deploys `docs/` to GitHub Pages.
+- Pushing a `v*` tag triggers `.github/workflows/release.yml`: builds and attaches extension ZIPs to a GitHub Release.
+- After merging, configure GitHub Pages source to "GitHub Actions" in repo Settings > Pages.
+
+### Testing
 
 There is no automated test suite. To manually test:
-1. Serve the repo root with any static HTTP server (e.g., `npx http-server . -p 8081`).
-2. Open any HTML page in Chrome.
-3. In DevTools Console, run: `fetch('http://localhost:8081/dist/bookmarklet.js').then(r=>r.text()).then(code=>eval(code))` to inject the bookmarklet.
-4. The heading outline panel should appear on the right side. Skipped heading levels appear in red.
+1. Run `yarn build` to produce `dist/`.
+2. Serve the repo root: `npx http-server . -p 8081`.
+3. **Bookmarklet**: open any page, then in DevTools Console run `fetch('http://localhost:8081/dist/bookmarklet.js').then(r=>r.text()).then(code=>eval(code))`.
+4. **Extension**: unzip `dist/h123-chrome.zip` into a folder, load it as an unpacked extension in `chrome://extensions/` (Developer mode), then click the extension icon on any page.
+5. The heading outline panel should appear on the right side. Skipped heading levels appear in red.
 
 ### Linting
 
