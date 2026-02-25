@@ -50,18 +50,9 @@ async function generateReadme() {
     writeFile('./docs/index.html', updatedHtml);
 }
 
-async function buildChromeExtension() {
+function buildExtensionZip(manifest) {
     const zip = new JSZip();
-    const config = getPackageConfig();
-    let manifest = readFile('src/chrome/manifest.json');
-    manifest = replaceAll(manifest, {
-        '{{name}}': 'Accessibility Heading Outliner',
-        '{{description}}': 'See the heading outline like a screenreader.',
-        '{{homepage}}': 'https://hinderlingvolkart.github.io/h123/',
-        '{{version}}': config.version
-    });
-
-    const backgroundJS = readFile('src/chrome/background.js');
+    const backgroundJS = readFile('src/extension/background.js');
     const bookmarkletJS = readFile('dist/bookmarklet.js');
 
     zip.file('manifest.json', manifest);
@@ -69,12 +60,37 @@ async function buildChromeExtension() {
     zip.file('bookmarklet.js', bookmarkletJS);
 
     [16, 48, 128].forEach(size => {
-        const icon = readFileSync(`./src/chrome/icon-${size}.png`);
+        const icon = readFileSync(`./src/extension/icon-${size}.png`);
         zip.file(`icon-${size}.png`, icon, { base64: false, binary: true });
     });
 
-    const content = await zip.generateAsync({ type: 'nodebuffer' });
-    writeFileSync('./dist/AccessibilityOutlinerChrome.zip', content);
+    return zip;
+}
+
+async function buildExtensions() {
+    const config = getPackageConfig();
+    const rawManifest = readFile('src/extension/manifest.json');
+    const baseManifest = replaceAll(rawManifest, {
+        '{{name}}': 'Accessibility Heading Outliner',
+        '{{description}}': 'See the heading outline like a screenreader.',
+        '{{homepage}}': 'https://hinderlingvolkart.github.io/h123/',
+        '{{version}}': config.version
+    });
+
+    const chromeZip = buildExtensionZip(baseManifest);
+    const chromeContent = await chromeZip.generateAsync({ type: 'nodebuffer' });
+    writeFileSync('./dist/h123-chrome.zip', chromeContent);
+
+    const firefoxManifest = JSON.parse(baseManifest);
+    firefoxManifest.browser_specific_settings = {
+        gecko: {
+            id: 'h123@hinderlingvolkart.com',
+            strict_min_version: '109.0'
+        }
+    };
+    const firefoxZip = buildExtensionZip(JSON.stringify(firefoxManifest, null, 4));
+    const firefoxContent = await firefoxZip.generateAsync({ type: 'nodebuffer' });
+    writeFileSync('./dist/h123-firefox.zip', firefoxContent);
 }
 
 function compileTypeScript() {
@@ -122,7 +138,7 @@ async function compile() {
 
 async function build() {
     await compile();
-    await buildChromeExtension();
+    await buildExtensions();
     await generateReadme();
 }
 
