@@ -40,10 +40,9 @@ function prepareJSVariable(str) {
     return str;
 }
 
-async function generateReadme() {
+async function generateSite() {
     const markdown = readFile('src/readme.md');
     const updatedMarkdown = replaceAll(markdown, { '{{bookmarklet}}': getBookmarklet() });
-    writeFile('./readme.md', updatedMarkdown);
 
     const html = readFile('src/readme.html');
     const updatedHtml = replaceAll(html, { '{{content}}': marked(updatedMarkdown) });
@@ -139,7 +138,7 @@ async function compile() {
 async function build() {
     await compile();
     await buildExtensions();
-    await generateReadme();
+    await generateSite();
 }
 
 (async () => {

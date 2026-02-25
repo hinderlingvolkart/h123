@@ -12,6 +12,13 @@ See the headings like a screenreader!
 [H1️⃣2️⃣3️⃣][1]
 [h❶❷❸][1]
 
+## Browser extensions
+
+[Chrome Extension](https://github.com/hinderlingvolkart/h123/releases/latest)
+[Firefox Add-on](https://github.com/hinderlingvolkart/h123/releases/latest)
+
+Download from the [latest release](https://github.com/hinderlingvolkart/h123/releases/latest). The same extension also works in Safari via Apple's [safari-web-extension-converter](https://developer.apple.com/documentation/safariservices/converting-a-web-extension-for-safari).
+
 ## Why you should
 
 If you are a web developer, you might have heard of sectioning content. Those were introduced with article, nav, section and such to provide a scope for headings and footers. They allowed to semantically structure an HTML document.
