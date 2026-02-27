@@ -47,7 +47,7 @@ Build outputs (all in `dist/`):
 
 ### CI
 
-- **Push to `main`** — builds and deploys the GitHub Pages site.
+- **Push to `main` / `master`** — builds and deploys the GitHub Pages site.
 - **Push a tag `v*`** — builds and creates a GitHub Release with the extension ZIPs attached.
 
 ## License

@@ -13,7 +13,7 @@ h123 is an accessibility HTML5 heading outliner — a browser bookmarklet and cr
 
 ### CI
 
-- Push to `main` triggers `.github/workflows/build.yml`: builds and deploys `docs/` to GitHub Pages.
+- Push to `main`/`master` triggers `.github/workflows/deploy.yml`: builds and deploys `docs/` to GitHub Pages.
 - Pushing a `v*` tag triggers `.github/workflows/release.yml`: builds and attaches extension ZIPs to a GitHub Release.
 - After merging, configure GitHub Pages source to "GitHub Actions" in repo Settings > Pages.
 
