@@ -12,7 +12,6 @@ var containerStyle = 'position: fixed; top: 0; right: 0; max-height: 100%; box-s
 var highlighterEl = document.createElement('DIV');
 highlighterEl.id = 'h1-a11y-highlighterelement';
 highlighterEl.style.cssText = 'pointer-events: none; position: fixed; border: 1px dashed #0081BE; box-shadow: 0 0 54px 0 rgba(0,84,150,0.3); display: none; z-index: 1000000; transition: all 200ms;';
-
 // remove existing instances
 var container = document.getElementById(containerId);
 if (container) {
@@ -51,33 +50,36 @@ iframe.onload = function () {
   }
   targetEl = doc.querySelector('#o-hidden-count');
   if (targetEl) {
-    targetEl.innerText = outline.length - countOutline(outline, 'visible');
+    targetEl.innerText = (outline.length - countOutline(outline, 'visible')).toString();
   }
   targetEl = doc.querySelector('#o-visuallyhidden-count');
   if (targetEl) {
-    targetEl.innerText = countOutline(outline, 'visuallyhidden');
+    targetEl.innerText = countOutline(outline, 'visuallyhidden').toString();
   }
   switcher('o-hidden', 'show-hidden');
   switcher('o-visuallyhidden', 'mark-visuallyhidden');
   handleHoverHighlight(doc.getElementById('o-highlight'));
   updateHeight();
   doc.addEventListener('mouseover', function (event) {
-    var link;
-    if (event.target.nodeName.toUpperCase() === 'A') {
-      link = event.target;
-    } else if (event.target.parentElement && event.target.parentElement.nodeName.toUpperCase() === 'A') {
-      link = event.target.parentElement;
+    var link = null;
+    var target = event.target;
+    if (target.nodeName.toUpperCase() === 'A') {
+      link = target;
+    } else if (target.parentElement && target.parentElement.nodeName.toUpperCase() === 'A') {
+      link = target.parentElement;
     }
     if (!link) return;
-    var index = parseInt(link.getAttribute('href').substr(1), 10);
-    var target = outline[index].el;
-    highlightElement(target);
+    var href = link.getAttribute('href');
+    if (!href) return;
+    var index = parseInt(href.substr(1), 10);
+    var targetElement = outline[index].el;
+    highlightElement(targetElement);
   }, false);
   window.addEventListener('resize', updateHeight);
   function switcher(id, className) {
     var checkbox = doc.getElementById(id);
     var target = doc.querySelector('.result');
-    if (checkbox) {
+    if (checkbox && target) {
       var check = function check(e) {
         if (checkbox.checked) {
           target.classList.add(className);
@@ -94,6 +96,7 @@ iframe.onload = function () {
 };
 document.body.appendChild(container);
 function updateHeight() {
+  if (!container) return;
   container.style.height = '0px';
   container.style.height = doc.scrollingElement.scrollHeight + 'px';
 }
@@ -104,12 +107,18 @@ function getOutline() {
   for (var i = 0; i < els.length; i++) {
     var el = els[i];
     var visible = isVisible(els[i]);
-    var n = parseInt(el.getAttribute('aria-level') || el.nodeName.charAt(1));
+    var ariaLevel = el.getAttribute('aria-level');
+    var n = parseInt(ariaLevel || el.nodeName.charAt(1));
+    var wrongLevel = false;
     if (visible) {
-      var wrongLevel = n > previousLevel && n !== previousLevel + 1;
+      wrongLevel = n > previousLevel && n !== previousLevel + 1;
+      // the first heading can be h1 or h2
+      // see https://www.w3.org/WAI/tutorials/page-structure/headings/ (Example 2)
+      // (they don't say it can't be h3, but that would not make sense)
+      if (previousLevel === 0) {
+        wrongLevel = n > 2;
+      }
       previousLevel = n;
-    } else {
-      wrongLevel = false;
     }
     result.push({
       visible: visible,
@@ -131,8 +140,8 @@ function countOutline(list, key) {
 function outlineToHTML(list) {
   var html = '';
   for (var i = 0; i < list.length; i++) {
-    var item = list[i],
-      el = item.el;
+    var item = list[i];
+    var el = item.el;
     html += '<li class="';
     html += item.wrong ? 'wrong-level' : 'correct-level';
     html += item.visible ? '' : ' hidden';
@@ -152,7 +161,8 @@ function htmlEntities(str) {
 function isVisible(el) {
   var css = window.getComputedStyle(el);
   var cssVisible = false;
-  while (el) {
+  var currentEl = el;
+  while (currentEl) {
     if (css['display'] === 'none') {
       return false;
     }
@@ -164,13 +174,13 @@ function isVisible(el) {
         cssVisible = true;
       }
     }
-    if (el.getAttribute('aria-hidden') === 'true') {
+    if (currentEl.getAttribute('aria-hidden') === 'true') {
       return false;
     }
-    var node = el.assignedSlot || el;
-    el = node.parentElement || node.getRootNode().host;
+    var node = currentEl.assignedSlot || currentEl;
+    currentEl = node.parentElement || node.getRootNode().host;
     try {
-      css = window.getComputedStyle(el);
+      css = window.getComputedStyle(currentEl);
     } catch (error) {
       return true; // happens on window element
     }
@@ -178,7 +188,7 @@ function isVisible(el) {
   return true;
 }
 function isVisuallyHidden(el) {
-  var size = el.getBoundingClientRect(el);
+  var size = el.getBoundingClientRect();
   var css = window.getComputedStyle(el);
   if (css.position === 'absolute') {
     if (size.width <= 1 && size.height <= 1) {
@@ -188,6 +198,7 @@ function isVisuallyHidden(el) {
       return true; // although that's not the best idea ...
     }
   }
+  return false;
 }
 function highlightElement(el, disableAutoScroll) {
   if (!disableAutoScroll) {
@@ -195,12 +206,12 @@ function highlightElement(el, disableAutoScroll) {
       el.scrollIntoViewIfNeeded();
     } else if (el.scrollIntoView) {
       el.scrollIntoView();
-    } else {}
+    }
   }
   setTimeout(function () {
     var size = el.getBoundingClientRect();
-    var visible = true,
-      parent = el.parentElement;
+    var visible = true;
+    var parent = el.parentElement;
     while (!size.height && !size.width && !size.left && !size.top && parent) {
       size = parent.getBoundingClientRect();
       visible = false;
@@ -209,23 +220,19 @@ function highlightElement(el, disableAutoScroll) {
     if (!parent) {
       return;
     }
-    size = {
-      left: size.left,
-      top: size.top,
-      bottom: size.bottom,
-      right: size.right
+    var boundingBox = {
+      left: Math.min(window.innerWidth, size.left),
+      right: Math.max(0, size.right),
+      top: Math.min(window.innerHeight, size.top),
+      bottom: Math.max(0, size.bottom)
     };
-    size.left = Math.min(window.innerWidth, size.left);
-    size.right = Math.max(0, size.right);
-    size.top = Math.min(window.innerHeight, size.top);
-    size.bottom = Math.max(0, size.bottom);
     if (!document.getElementById(highlighterEl.id)) {
       document.body.appendChild(highlighterEl);
     }
-    highlighterEl.style.left = size.left - 10 + 'px';
-    highlighterEl.style.width = size.right - size.left + 20 + 'px';
-    highlighterEl.style.top = size.top - 10 + 'px';
-    highlighterEl.style.height = size.bottom - size.top + 20 + 'px';
+    highlighterEl.style.left = boundingBox.left - 10 + 'px';
+    highlighterEl.style.width = boundingBox.right - boundingBox.left + 20 + 'px';
+    highlighterEl.style.top = boundingBox.top - 10 + 'px';
+    highlighterEl.style.height = boundingBox.bottom - boundingBox.top + 20 + 'px';
     highlighterEl.style.display = 'block';
   }, 100);
 }
@@ -280,63 +287,47 @@ function enableHoverHighlight() {
 function disableHoverHighlight() {
   document.body.removeEventListener('mouseover', handleElementHover);
 }
-
 /**
  * Find DOM nodes everywhere, traversing any shadow boundaries
  * Based on https://stackoverflow.com/a/71666543
- *
- * @param {HTMLElement} node 
- * @param {String} selector 
- * @returns {HTMLElement[]}
  */
 function customQuerySelectorAll(node, selector) {
   var nodes = [];
   var nodeIterator = document.createNodeIterator(node, Node.ELEMENT_NODE);
   var currentNode;
   while (currentNode = nodeIterator.nextNode()) {
-    if (currentNode.matches(selector)) {
-      nodes.push(currentNode);
-    } else if (currentNode.shadowRoot) {
-      nodes.push.apply(nodes, _toConsumableArray(customQuerySelectorAll(currentNode.shadowRoot, selector)));
+    var element = currentNode;
+    if (element.matches(selector)) {
+      nodes.push(element);
+    } else if (element.shadowRoot) {
+      nodes.push.apply(nodes, _toConsumableArray(customQuerySelectorAll(element.shadowRoot, selector)));
     }
   }
   return nodes;
 }
-
 /**
  * Find text content, including slotted text
  *
  * TODO: Handle any order of slots and text nodes
- *
- * @param {HTMLElement} el 
- * @returns {String}
  */
 function textContent(el) {
-  var parts = [el.textContent];
+  var parts = [el.textContent || ''];
   var slots = el.querySelectorAll('slot');
-  var _iterator = _createForOfIteratorHelper(slots),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var slot = _step.value;
-      var nodes = slot.assignedNodes();
-      var _iterator2 = _createForOfIteratorHelper(nodes),
-        _step2;
-      try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var node = _step2.value;
-          parts.push(node.textContent);
-        }
-      } catch (err) {
-        _iterator2.e(err);
-      } finally {
-        _iterator2.f();
+  for (var i = 0; i < slots.length; i++) {
+    var slot = slots[i];
+    var nodes = slot.assignedNodes();
+    var _iterator = _createForOfIteratorHelper(nodes),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var node = _step.value;
+        parts.push(node.textContent || '');
       }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
     }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
   }
   var textContent = parts.filter(Boolean).join(' ');
   return textContent;
