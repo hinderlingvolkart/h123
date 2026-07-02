@@ -80,6 +80,9 @@ li.hidden {
 li.wrong-level {
   color: #AF3A37;
 }
+li.wrong-level a > .level {
+  border-radius: 50%;
+}
 
 a.is-active {
   box-shadow: 0 0 5px 1px #3CBEFF;

@@ -127,6 +127,43 @@ function updateHeight(): void {
   container.style.height = doc.scrollingElement!.scrollHeight + 'px';
 }
 
+function getComputedRole(el: HTMLElement): string | null {
+  const computedRole = (el as HTMLElement & { computedRole?: string | null }).computedRole;
+  if (typeof computedRole === 'string' && computedRole !== '') {
+    return computedRole;
+  }
+  return null;
+}
+
+function isHeadingElement(el: HTMLElement): boolean {
+  if (el.getAttribute('role') === 'presentation') {
+    return false;
+  }
+
+  if (getComputedRole(el) === 'heading') {
+    return true;
+  }
+
+  if (/^H[1-9]$/i.test(el.nodeName)) {
+    return true;
+  }
+
+  if (el.getAttribute('role') === 'heading') {
+    return true;
+  }
+
+  // Web components with default role via ElementInternals
+  const tag = el.tagName.toLowerCase();
+  if (tag.includes('-')) {
+    const level = el.getAttribute('level');
+    if (level && /^[1-6]$/.test(level) && /(?:^|-)(?:title|heading)(?:-|$)/.test(tag)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function getHeadingLevel(el: HTMLElement): number {
   const ariaLevel = el.getAttribute('aria-level');
   if (ariaLevel !== null && ariaLevel !== '') {
@@ -141,8 +178,16 @@ function getHeadingLevel(el: HTMLElement): number {
     return parseInt(tagMatch[1], 10);
   }
 
+  const levelAttr = el.getAttribute('level');
+  if (levelAttr !== null && levelAttr !== '') {
+    const parsed = parseInt(levelAttr, 10);
+    if (Number.isFinite(parsed) && parsed >= 1) {
+      return parsed;
+    }
+  }
+
   // ARIA: missing aria-level on role="heading" defaults to 2
-  if (el.getAttribute('role') === 'heading') {
+  if (el.getAttribute('role') === 'heading' || getComputedRole(el) === 'heading') {
     return 2;
   }
 
@@ -151,7 +196,7 @@ function getHeadingLevel(el: HTMLElement): number {
 
 function getOutline(): OutlineItem[] {
   let previousLevel: number = 0;
-  const els: HTMLElement[] = customQuerySelectorAll(document, ':is(h1,h2,h3,h4,h5,h6,h7,[role="heading"]):not([role="presentation"])');
+  const els: HTMLElement[] = findAllHeadingElements(document);
   const result: OutlineItem[] = [];
   
   for (let i = 0; i < els.length; i++) {
@@ -365,20 +410,19 @@ function disableHoverHighlight(): void {
 }
 
 /**
- * Find DOM nodes everywhere, traversing any shadow boundaries
- * Based on https://stackoverflow.com/a/71666543
+ * Find heading elements everywhere, traversing any shadow boundaries
  */
-function customQuerySelectorAll(node: Document | DocumentFragment, selector: string): HTMLElement[] {
+function findAllHeadingElements(node: Document | DocumentFragment): HTMLElement[] {
   const nodes: HTMLElement[] = [];
   const nodeIterator: NodeIterator = document.createNodeIterator(node, Node.ELEMENT_NODE);
   let currentNode: Node | null;
 
   while (currentNode = nodeIterator.nextNode()) {
     const element = currentNode as HTMLElement;
-    if (element.matches(selector)) {
+    if (isHeadingElement(element)) {
       nodes.push(element);
     } else if ((element as any).shadowRoot) {
-      nodes.push(...customQuerySelectorAll((element as any).shadowRoot, selector));
+      nodes.push(...findAllHeadingElements((element as any).shadowRoot));
     }
   }
 
