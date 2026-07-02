@@ -127,6 +127,28 @@ function updateHeight(): void {
   container.style.height = doc.scrollingElement!.scrollHeight + 'px';
 }
 
+function getHeadingLevel(el: HTMLElement): number {
+  const ariaLevel = el.getAttribute('aria-level');
+  if (ariaLevel !== null && ariaLevel !== '') {
+    const parsed = parseInt(ariaLevel, 10);
+    if (Number.isFinite(parsed) && parsed >= 1) {
+      return parsed;
+    }
+  }
+
+  const tagMatch = el.nodeName.match(/^H([1-9])$/i);
+  if (tagMatch) {
+    return parseInt(tagMatch[1], 10);
+  }
+
+  // ARIA: missing aria-level on role="heading" defaults to 2
+  if (el.getAttribute('role') === 'heading') {
+    return 2;
+  }
+
+  return 1;
+}
+
 function getOutline(): OutlineItem[] {
   let previousLevel: number = 0;
   const els: HTMLElement[] = customQuerySelectorAll(document, ':is(h1,h2,h3,h4,h5,h6,h7,[role="heading"]):not([role="presentation"])');
@@ -135,8 +157,7 @@ function getOutline(): OutlineItem[] {
   for (let i = 0; i < els.length; i++) {
     const el: HTMLElement = els[i];
     const visible: boolean = isVisible(els[i]);
-    const ariaLevel = el.getAttribute('aria-level');
-    const n: number = parseInt(ariaLevel || el.nodeName.charAt(1));
+    const n: number = getHeadingLevel(el);
     let wrongLevel: boolean = false;
     
     if (visible) {
