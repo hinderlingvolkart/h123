@@ -1,6 +1,6 @@
 # h①②③ – Accessibility HTML5 Outliner
 
-v1.1
+v1.2
 
 See the headings like a screenreader!
 
@@ -71,11 +71,13 @@ The new HTML 5.2 spec takes a step back and now recommends to always set your h1
       <p>Still belong to the section</p>
     </section>
     <section>
-      <h2>Another section</hh21>
+      <h2>Another section</h2>
       <p>And more content for the people</p>
     </section>
 
 Thing is that many people don't know. Some outliners show the structure of the whole document, including hidden parts. But guess what, screenreaders only read what's visible. Yeah, funny thing, right. If you think about it, it makes just sense though. So this outliner will only consider headings that are actually visible, at least visible to the screenreader. (because you can visually hide elements that stay theoretically visible).
+
+It also respects `aria-level` when it differs from the tag name, detects web component headings such as `<my-title level="2">`, and marks skipped levels in red.
 
 Our bookmarklet to the rescue!! :-)
 

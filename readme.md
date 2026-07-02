@@ -23,8 +23,10 @@ Screenreaders navigate pages by heading hierarchy (h1 → h2 → h3 …). When h
 h123 shows you the heading structure of any page *exactly* as a screenreader sees it:
 
 - Only visible headings are shown (not `display:none`, not `aria-hidden`)
-- Skipped heading levels are flagged in red
-- Shadow DOM boundaries are traversed
+- Skipped heading levels are flagged in red with a round level badge
+- `aria-level` overrides the native heading tag (e.g. `<h2 aria-level="4">`)
+- Web component headings are supported (e.g. `<my-title level="2">` via ElementInternals)
+- Open Shadow DOM boundaries are traversed
 - Visually-hidden headings can be highlighted
 
 ## Development

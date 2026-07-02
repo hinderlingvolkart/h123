@@ -9,6 +9,7 @@ h123 is an accessibility HTML5 heading outliner — a browser bookmarklet and cr
 - `yarn build` runs `node build.js`, which compiles, transpiles (Babel), minifies (Terser), packages extensions, and generates the GitHub Pages site into `docs/`.
 - Build outputs (all in `dist/`, gitignored): `bookmarklet.js`, `bookmarklet.min.js`, `h123-chrome.zip`, `h123-firefox.zip`. Also generates `docs/index.html` (gitignored).
 - `readme.md` is hand-written (not generated). The Pages content template is `src/readme.md`.
+- Source of truth for the bookmarklet is `src/bookmarklet.ts` (compiled via `build.js`).
 - The browserslist "caniuse-lite is outdated" warning is cosmetic and does not affect the build.
 
 ### CI
@@ -24,7 +25,8 @@ There is no automated test suite. To manually test:
 2. Serve the repo root: `npx http-server . -p 8081`.
 3. **Bookmarklet**: open any page, then in DevTools Console run `fetch('http://localhost:8081/dist/bookmarklet.js').then(r=>r.text()).then(code=>eval(code))`.
 4. **Extension**: unzip `dist/h123-chrome.zip` into a folder, load it as an unpacked extension in `chrome://extensions/` (Developer mode), then click the extension icon on any page.
-5. The heading outline panel should appear on the right side. Skipped heading levels appear in red.
+5. The heading outline panel should appear on the right side. Skipped heading levels appear in red with a round level badge.
+6. **Web components**: test on a page with `<sbb-title level="2">` (e.g. sbb.ch) — the title should appear as a level-2 heading.
 
 ### Linting
 
